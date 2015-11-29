@@ -1,0 +1,11 @@
+name: StopRain
+description: Stop the rain
+author: StarTux
+version: 0.1
+main: com.winthier.endrain.StopRainPlugin
+commands:
+  endrain:
+    aliases: [ stoprain, norain ]
+    description: Stop the rain on your client
+    usage: /<command> [on|off]
+permissions: {}
