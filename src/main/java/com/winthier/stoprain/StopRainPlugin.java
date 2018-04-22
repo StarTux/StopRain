@@ -3,8 +3,10 @@ package com.winthier.endrain;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.bukkit.ChatColor;
@@ -16,18 +18,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class StopRainPlugin extends JavaPlugin implements Listener {
-    Set<UUID> players;
-    
+public final class StopRainPlugin extends JavaPlugin implements Listener {
+    private Set<UUID> players;
+    private boolean supportMiniMap = true;
+
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
         for (Player player: getServer().getOnlinePlayers()) {
-            if (getPlayers().contains(player.getUniqueId())) {
-                player.setPlayerWeather(WeatherType.CLEAR);
-            }
+            setupPlayer(player);
         }
     }
 
@@ -39,7 +41,7 @@ public class StopRainPlugin extends JavaPlugin implements Listener {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String args[]) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) return false;
         Player player = (Player)sender;
         if (args.length == 0) {
@@ -116,8 +118,34 @@ public class StopRainPlugin extends JavaPlugin implements Listener {
     }
 
     @EventHandler public void onPlayerJoin(PlayerJoinEvent event) {
-        if (getPlayers().contains(event.getPlayer().getUniqueId())) {
-            event.getPlayer().setPlayerWeather(WeatherType.CLEAR);
+        setupPlayer(event.getPlayer());
+    }
+
+    void setupPlayer(Player player) {
+        final UUID uuid = player.getUniqueId();
+        if (getPlayers().contains(uuid)) {
+            player.setPlayerWeather(WeatherType.CLEAR);
+        }
+        if (supportMiniMap) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("Type", "Boolean");
+            map.put("Value", players.contains(uuid));
+            map.put("DisplayName", "Disable Rain");
+            map.put("Priority", 0);
+            Runnable onUpdate = () -> {
+                boolean v = map.get("Value") == Boolean.TRUE;
+                if (v) {
+                    players.add(uuid);
+                    player.setPlayerWeather(WeatherType.CLEAR);
+                } else {
+                    players.remove(uuid);
+                    player.resetPlayerWeather();
+                }
+            };
+            map.put("OnUpdate", onUpdate);
+            List<Map> list = new ArrayList<>();
+            list.add(map);
+            player.setMetadata("MiniMapSettings", new FixedMetadataValue(this, list));
         }
     }
 }
