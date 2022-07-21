@@ -1,13 +1,18 @@
+main: com.winthier.stoprain.StopRainPlugin
 name: StopRain
+
+version: 0.1
+api-version: 1.19
+
 description: Stop the rain
 author: StarTux
-version: 0.1
-api-version: 1.13
 website: https://cavetale.com
-main: com.winthier.endrain.StopRainPlugin
+
 commands:
+
   endrain:
     aliases: [ stoprain, norain ]
     description: Stop the rain on your client
     usage: /<command> [on|off]
+
 permissions: {}
