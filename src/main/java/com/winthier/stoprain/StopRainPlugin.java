@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.bukkit.ChatColor;
 import org.bukkit.WeatherType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,6 +16,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public final class StopRainPlugin extends JavaPlugin implements Listener {
     private final Set<UUID> players = new HashSet<>();
@@ -61,22 +62,22 @@ public final class StopRainPlugin extends JavaPlugin implements Listener {
         if (on) {
             if (players.contains(uuid)) {
                 player.setPlayerWeather(WeatherType.CLEAR);
-                player.sendMessage(ChatColor.DARK_AQUA + "Rain is already turned off.");
+                player.sendMessage(text("Rain is already turned off", RED));
             } else {
                 players.add(uuid);
                 savePlayers();
                 player.setPlayerWeather(WeatherType.CLEAR);
-                player.sendMessage(ChatColor.DARK_AQUA + "The rain will stop in a jiffy.");
+                player.sendMessage(text("The rain will stop in a jiffy", DARK_AQUA));
             }
         } else {
             if (players.contains(uuid)) {
                 players.remove(uuid);
                 savePlayers();
                 player.resetPlayerWeather();
-                player.sendMessage(ChatColor.DARK_AQUA + "Rain turned back on.");
+                player.sendMessage(text("Rain turned back on", AQUA));
             } else {
                 player.resetPlayerWeather();
-                player.sendMessage(ChatColor.DARK_AQUA + "Rain already turned on.");
+                player.sendMessage(text("Rain already turned on", RED));
             }
         }
     }
